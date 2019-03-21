@@ -9,6 +9,18 @@ if ( !class_exists( 'Taxonomy_Term_Addon' ) ) {
       add_action( 'plugins_loaded', array( $this,'taxonomy_listing_addon_load_textdomain' ) );
     }
 
+    // Constructor for the taxonomy term listing. Loads options and hooks in the init method.
+    public function checkBoolean( $string ) { 
+      if( is_string($string) && $string == '1' ||
+          is_string($string) && strtolower($string) == 'true' ||
+          is_bool($string) && $string === TRUE ){
+        return TRUE;
+      }
+
+      return FALSE;
+
+    }
+
     // Include or mapping
     function termlisting() {
       vc_map( array(
@@ -83,6 +95,15 @@ if ( !class_exists( 'Taxonomy_Term_Addon' ) ) {
             'description' => __('For styling any particular element','taxonomy-term-listing-visual-composer-addon'),
             'admin_label' => 'false',
           ),
+          array(
+            'type' => 'article_taxonomy_display',
+            'class' => '',
+            'heading' => __( '', 'taxonomy-term-listing-visual-composer-addon' ),
+            'param_name' => 'article_taxonomy_display',
+            'value' => 'false',
+            'description' => '',
+            'admin_label' => 'false',
+          ),
         )
       ) );
     }
@@ -148,6 +169,18 @@ if ( !class_exists( 'Taxonomy_Term_Addon' ) ) {
       <?php return $include_count_display;
     }
 
+    function article_taxonomy_display_settings_field( $settings, $value ) {
+      $include_count_display = '<div class="include-count"><input name="'. esc_attr( $settings['param_name'] ) .'" class="wpb_vc_param_value checkbox" type="checkbox" value="' . ( ( $value != "" ) ? $value : 1 ) . '" ' . ( $value == 1 ? checked : '' ) . '' . ( ( $value == "" ) ? checked : '' ) . ' >'.__('show taxonomies from this article','taxonomy-term-listing-visual-composer-addon') . '</div>'; ?>
+      <script>
+      (function( $ ) {
+        jQuery( 'input[name="article_taxonomy_display"]' ).on( 'change', function() {
+          this.value = this.checked ? 1 : 0 ;
+        });
+      })( jQuery );
+      </script>
+      <?php return $include_count_display;
+    }
+
     function hide_empty_settings_field( $settings, $value ){
       $hide_empty_cat = '<div class="hide_empty_main"><input name="'. esc_attr( $settings['param_name'] ) .'" class="wpb_vc_param_value checkbox" type="checkbox" value="' . ( ( $value != "" ) ? $value : 1 ) . '" ' . ( $value == 1 ? checked : '' ) . '' . ( ( $value == "" ) ? checked : '' ) . ' >'.__('Hide Empty Category','taxonomy-term-listing-visual-composer-addon') . '</div>'; ?>
       <script>
@@ -174,16 +207,36 @@ if ( !class_exists( 'Taxonomy_Term_Addon' ) ) {
 
     // frontend view 
     function term_listing_func( $atts ) {
+      global $post;
+
       $specific_subcategory = isset( $atts['specific_subcategory'] ) ? $atts['specific_subcategory'] : 0 ;
       $order_attr = ( isset( $atts['order'] ) ? $atts['order'] : 'ASC' );
       $taxonomy_names_attr = ( isset( $atts['taxonomy_names'] ) ? $atts['taxonomy_names'] : NULL ); 
       $class = ( isset( $atts['extra_class_name']) ? "class = ".$atts['extra_class_name'] : "");
-      $arguments = array( 'hide_empty' => $atts['hide_empty'], 'order' => $order_attr, 'parent'=> 0 ); 
+      $arguments = array( 'hide_empty' => $atts['hide_empty'], 'order' => $order_attr, 'parent'=> 0 );
+
+      $article_taxonomy_display = $this->checkBoolean( isset( $atts['article_taxonomy_display'] ) ? $atts['article_taxonomy_display'] : FALSE );
+
+      $post_id = NULL;
+      if( !is_null($post) && isset($post->ID) ){
+        $post_id = $post->ID;
+      }
+
+      if( !is_numeric($post_id) ){
+        $article_taxonomy_display = FALSE;
+      }
+
       if ( isset( $atts['specific_subcategory'] ) || $atts['include_subcategory'] == 1 ) {
         if ( isset( $atts['specific_subcategory'] ) ) {
           $arguments = array( 'hide_empty' => $atts['hide_empty'], 'order' => $order_attr, 'parent' => $specific_subcategory ); 
         }
-        $term = get_terms( $taxonomy_names_attr,$arguments );
+        
+        if( $article_taxonomy_display === TRUE ){
+          $term = wp_get_post_terms( $post_id, $taxonomy_names_attr, $arguments );
+        }else{
+          $term = get_terms( $taxonomy_names_attr,$arguments );
+        }
+        
         $response = '';
         $response = '<div class="vc_taxonomy_listing">';
         $response .= '<ul ' . $class . '>';
@@ -214,11 +267,18 @@ if ( !class_exists( 'Taxonomy_Term_Addon' ) ) {
           }
         }
         $response .= '</ul>';
+        $response .= '</div>';
         return $response;
       } else {
-        $term = get_terms( $taxonomy_names_attr,$arguments );
+        if( $article_taxonomy_display === TRUE ){
+          $term = wp_get_post_terms( $post_id, $taxonomy_names_attr, $arguments );
+        }else{
+          $term = get_terms( $taxonomy_names_attr,$arguments );
+        }
+
         $response = '';
         $response = '<ul>';
+        $response = '<div class="vc_taxonomy_listing">';
         foreach ($term as $terms ){
           $response .= '<li><a href="' . get_term_link( $terms->term_id ) . '">' . $terms->name . ( $atts['count'] == 1 ? '(' . $terms->count . ')' : '') . '</a></li>';
         }
@@ -235,7 +295,8 @@ vc_add_shortcode_param( 'Taxonomy_Names',  array($taxonomy_listing_obj, 'taxonom
 vc_add_shortcode_param( 'include_child_category', array( $taxonomy_listing_obj, 'include_child_settings_field' ) );
 vc_add_shortcode_param( 'count_display', array( $taxonomy_listing_obj, 'count_display_settings_field' ) );
 vc_add_shortcode_param( 'Hide_empty', array( $taxonomy_listing_obj, 'hide_empty_settings_field' ) );
-vc_add_shortcode_param( 'specific_subcategory', array( $taxonomy_listing_obj, 'specific_subcategory_settings_field' ) );
+vc_add_shortcode_param( 'article_taxonomy_display', array( $taxonomy_listing_obj, 'article_taxonomy_display_settings_field' ) );
+vc_add_shortcode_param( 'count_display', array( $taxonomy_listing_obj, 'count_display_settings_field' ) );
 add_shortcode( 'taxonomy_term', array( $taxonomy_listing_obj, 'term_listing_func' ) );
 
 // Ajax call for selection of parent term id. 

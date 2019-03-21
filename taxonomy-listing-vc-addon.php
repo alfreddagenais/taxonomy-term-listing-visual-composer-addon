@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Term Listing - Visual Composer Addon
 Author: Manisha Makhija
 Author URI: https://profiles.wordpress.org/manishamakhija
-Version: 1.1
+Version: 1.1.1
 Description: Creates nested list of categories
 Text Domain: taxonomy-term-listing-visual-composer-addon
 Domain path: /languages
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ){
 	exit;
 }
 
-define( 'TAXONOMY_LISTING_ADDON_VERSION', '1.0' );
+define( 'TAXONOMY_LISTING_ADDON_VERSION', '1.1.1' );
 define( 'TAXONOMY_LISTING_ADDON_REQUIRED_WP_VERSION', '4.3' );
 define( 'TAXONOMY_LISTING_ADDON', __FILE__ );
 define( 'TAXONOMY_LISTING_ADDON_BASENAME', plugin_basename( TAXONOMY_LISTING_ADDON ) );
