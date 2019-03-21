@@ -1,0 +1,67 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 10:52+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco - https://localise.biz/"
+
+#: taxonomy-listing.php:13
+msgid "Taxonomy Term Listing"
+msgstr ""
+
+#: taxonomy-listing.php:26
+msgid "Select desired taxonomy name"
+msgstr ""
+
+#: taxonomy-listing.php:69
+msgid "Enter Parent term Id"
+msgstr ""
+
+#: taxonomy-listing.php:72
+msgid "include any specific subcategory"
+msgstr ""
+
+#: taxonomy-listing.php:78
+msgid "Extra Class Name"
+msgstr ""
+
+#: taxonomy-listing.php:81
+msgid "For styling any particular element"
+msgstr ""
+
+#: taxonomy-listing.php:90
+msgid "Select Taxonomy"
+msgstr ""
+
+#: taxonomy-listing.php:126
+msgid "include Subcategory"
+msgstr ""
+
+#: taxonomy-listing.php:138
+msgid "show count"
+msgstr ""
+
+#: taxonomy-listing.php:150
+msgid "Hide Empty Category"
+msgstr ""
+
+#: taxonomy-listing.php:163
+msgid "Select Taxonomy first"
+msgstr ""
+
+#. Name of the plugin
+msgid "Taxonomy Term Listing - Visual Composer Addon"
+msgstr ""
+
+#. Description of the plugin
+msgid "Creates nested list of categories"
+msgstr ""
